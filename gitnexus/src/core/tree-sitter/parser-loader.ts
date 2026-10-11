@@ -126,6 +126,17 @@ const SOURCES: Record<string, GrammarSource> = {
       'PHP parsing requires `tree-sitter-php` (the `php_only` export). ' +
       'Check the install and native binding.',
   },
+  // 1C:Enterprise BSL grammar (alkoleft/tree-sitter-bsl). Optional so a
+  // missing native binding only disables BSL parsing instead of failing analyze.
+  [SupportedLanguages.Bsl]: {
+    load: () => _require('tree-sitter-bsl'),
+    optional: true,
+    userSkippable: true,
+    unavailableNote:
+      'BSL (1C:Enterprise) parsing disabled: `tree-sitter-bsl` is an ' +
+      'optionalDependency and is not installed (or its native binding failed ' +
+      'to load on this platform).',
+  },
   [SupportedLanguages.Ruby]: {
     load: () => _require('tree-sitter-ruby'),
     unavailableNote:

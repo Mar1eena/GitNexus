@@ -24,4 +24,6 @@ export enum SupportedLanguages {
   /** Standalone regex processor — no tree-sitter, no LanguageProvider. */
   Cobol = 'cobol',
   Zig = 'zig',
+  /** 1C:Enterprise (BSL) — modules of 1C configurations in EDT / XML dump layout. */
+  Bsl = 'bsl',
 }

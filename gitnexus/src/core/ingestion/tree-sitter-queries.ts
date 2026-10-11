@@ -3056,6 +3056,16 @@ import { SupportedLanguages } from 'gitnexus-shared';
 
 const OBJECTIVE_C_QUERIES = `((translation_unit) @objc.root)`;
 
+// 1C:Enterprise BSL queries - works with tree-sitter-bsl (alkoleft)
+export const BSL_QUERIES = `
+; Procedures and functions
+(procedure_definition name: (identifier) @name) @definition.function
+(function_definition name: (identifier) @name) @definition.function
+
+; Calls — bare (Метод()) and dotted (Модуль.Метод()) both end in a method_call
+(method_call name: (identifier) @call.name) @call
+`;
+
 export const LANGUAGE_QUERIES: Record<SupportedLanguages, string> = {
   [SupportedLanguages.TypeScript]: TYPESCRIPT_QUERIES,
   [SupportedLanguages.JavaScript]: JAVASCRIPT_QUERIES,
@@ -3075,4 +3085,5 @@ export const LANGUAGE_QUERIES: Record<SupportedLanguages, string> = {
   [SupportedLanguages.Vue]: TYPESCRIPT_QUERIES, // Vue <script> blocks are parsed as TypeScript
   [SupportedLanguages.Cobol]: '', // Standalone regex processor — no tree-sitter queries
   [SupportedLanguages.Zig]: ZIG_QUERIES,
+  [SupportedLanguages.Bsl]: BSL_QUERIES,
 };

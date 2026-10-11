@@ -5,6 +5,7 @@ import {
   nestedCallableQualifiedName,
   positionQualifiedCallableName,
 } from './callable-id.js';
+import { createRequire } from 'node:module';
 import Parser from 'tree-sitter';
 import JavaScript from 'tree-sitter-javascript';
 import TypeScript from 'tree-sitter-typescript';
@@ -96,6 +97,13 @@ try {
 let ObjectiveC: TreeSitterLanguage | null = null;
 try {
   ObjectiveC = requireVendoredGrammar('tree-sitter-objc') as TreeSitterLanguage;
+} catch {}
+
+// 1C:Enterprise BSL grammar — npm `tree-sitter-bsl` (not vendored). Optional:
+// a missing native binding only disables BSL parsing in this worker.
+let Bsl: TreeSitterLanguage | null = null;
+try {
+  Bsl = createRequire(import.meta.url)('tree-sitter-bsl') as TreeSitterLanguage;
 } catch {}
 import { getLanguageFromFilename } from 'gitnexus-shared';
 import {
@@ -611,6 +619,7 @@ const languageMap: Record<string, TreeSitterLanguage> = {
   ...(Dart ? { [SupportedLanguages.Dart]: Dart } : {}),
   ...(Swift ? { [SupportedLanguages.Swift]: Swift } : {}),
   ...(Zig ? { [SupportedLanguages.Zig]: Zig } : {}),
+  ...(Bsl ? { [SupportedLanguages.Bsl]: Bsl } : {}),
 };
 
 /**

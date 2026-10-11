@@ -28,6 +28,7 @@ import { swiftScopeResolver } from '../../languages/swift/scope-resolver.js';
 import { dartScopeResolver } from '../../languages/dart/scope-resolver.js';
 import { vueScopeResolver } from '../../languages/vue/scope-resolver.js';
 import { zigScopeResolver } from '../../languages/zig/scope-resolver.js';
+import { bslScopeResolver } from '../../languages/bsl/scope-resolver.js';
 import { objectiveCScopeResolver } from '../../languages/objective-c/scope-resolver.js';
 
 /** Map of `SupportedLanguages` → `ScopeResolver`. The scope-resolution phase
@@ -54,5 +55,6 @@ export const SCOPE_RESOLVERS: ReadonlyMap<SupportedLanguages, ScopeResolver> = n
   [SupportedLanguages.Dart, dartScopeResolver],
   [SupportedLanguages.Vue, vueScopeResolver],
   [SupportedLanguages.Zig, zigScopeResolver],
+  [SupportedLanguages.Bsl, bslScopeResolver],
   [SupportedLanguages.ObjectiveC, objectiveCScopeResolver],
 ]);
