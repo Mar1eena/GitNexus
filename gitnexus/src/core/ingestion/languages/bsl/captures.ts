@@ -30,6 +30,12 @@ export function emitBslScopeCaptures(
 
   const out: CaptureMatch[] = [];
   for (const m of getBslScopeQuery().matches(tree.rootNode)) {
+    const callback = callbackReference(m.captures);
+    if (callback !== null) {
+      out.push(callback);
+      continue;
+    }
+
     const grouped: Record<string, Capture> = {};
     const nodeMap: Record<string, SyntaxNode> = {};
     for (const c of m.captures) {
@@ -53,6 +59,57 @@ export function emitBslScopeCaptures(
     out.push(grouped);
   }
   return out;
+}
+
+const NOTIFY_DESCRIPTION_TYPES: ReadonlySet<string> = new Set([
+  'описаниеоповещения',
+  'notifydescription',
+]);
+const IDLE_HANDLER_ATTACHERS: ReadonlySet<string> = new Set([
+  'подключитьобработчикожидания',
+  'attachidlehandler',
+]);
+
+/**
+ * Procedures invoked by name from a string — the backbone of async form code:
+ *
+ *   Новый ОписаниеОповещения("ПослеВыбора", ЭтотОбъект)  → member call, receiver = 2nd argument
+ *   Новый ОписаниеОповещения("Обработать", МодульКлиент)  → member call into that common module
+ *   ПодключитьОбработчикОжидания("Обновить", 1)            → free call (own module, then global modules)
+ *
+ * Anchored on the string literal so the site never collides with the
+ * ordinary `method_call` reference of the attaching call itself.
+ */
+function callbackReference(
+  captures: readonly { name: string; node: SyntaxNode }[],
+): CaptureMatch | null {
+  const byName = new Map(captures.map((c) => [c.name, c.node]));
+  const nameNode = byName.get('_callback.name');
+  if (nameNode === undefined) return null;
+  const name = nameNode.text;
+  if (!/^[\p{L}_][\p{L}\p{N}_]*$/u.test(name)) return null;
+
+  const notify = byName.get('_callback.notify');
+  if (notify !== undefined) {
+    const type = notify.childForFieldName('type')?.text;
+    if (type === undefined || !NOTIFY_DESCRIPTION_TYPES.has(normalizeBslName(type))) return null;
+    const receiver = notify.childForFieldName('arguments')?.namedChildren[1];
+    if (receiver === undefined || receiver === null) return null;
+    return {
+      '@reference.call.member': syntheticCapture('@reference.call.member', nameNode, name),
+      '@reference.name': nodeToCapture('@reference.name', nameNode),
+      '@reference.receiver': nodeToCapture('@reference.receiver', receiver),
+    };
+  }
+
+  const attach = byName.get('_callback.attach');
+  if (attach !== undefined && IDLE_HANDLER_ATTACHERS.has(normalizeBslName(attach.text))) {
+    return {
+      '@reference.call.free': syntheticCapture('@reference.call.free', nameNode, name),
+      '@reference.name': nodeToCapture('@reference.name', nameNode),
+    };
+  }
+  return null;
 }
 
 /** Parameter counts (defaults make a parameter optional) and the `Экспорт` flag. */

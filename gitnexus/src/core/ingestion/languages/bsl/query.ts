@@ -34,6 +34,22 @@ const BSL_SCOPE_QUERY = `
 ;; References — calls (free/member split happens in captures.ts)
 (method_call
   name: (identifier) @reference.name) @reference.call.free
+
+;; References — procedures called by name from a string literal
+;; (filtered and turned into call sites in captures.ts):
+;;   Новый ОписаниеОповещения("Имя", Модуль)
+(new_expression
+  type: (identifier)
+  arguments: (arguments
+    .
+    (expression (const_expression (string (string_content) @_callback.name))))) @_callback.notify
+
+;;   ПодключитьОбработчикОжидания("Имя", Интервал)
+(method_call
+  name: (identifier) @_callback.attach
+  arguments: (arguments
+    .
+    (expression (const_expression (string (string_content) @_callback.name)))))
 `;
 
 let _parser: Parser | null = null;

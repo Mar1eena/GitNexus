@@ -77,6 +77,19 @@ describe.skipIf(!bsl.available)('BSL basic resolution', () => {
     expect(calls).toContain('ОбработкаПроведения → СообщитьОбОшибке');
   });
 
+  it('links Новый ОписаниеОповещения("Имя", ЭтотОбъект) to the same module', () => {
+    expect(calls).toContain('Выбрать → ПослеОтвета');
+  });
+
+  it('links Новый ОписаниеОповещения("Имя", ОбщийМодуль) to that common module', () => {
+    expect(calls).toContain('Выбрать → ОбработатьОтвет');
+  });
+
+  it('links ПодключитьОбработчикОжидания("Имя") to the own module, then global modules', () => {
+    expect(calls).toContain('Выбрать → ОбновитьИндикатор');
+    expect(calls).toContain('Выбрать → ГлобальныйОбработчик');
+  });
+
   it('does not expose non-exported methods of a common module', () => {
     const fromOtherModules = getRelationships(result, 'CALLS').filter(
       (e) => e.target === 'ВнутреннийРасчет' && !e.sourceFilePath.includes('РаботаСКлиентами'),
